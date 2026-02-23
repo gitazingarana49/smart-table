@@ -46,12 +46,15 @@ function render(action) {
     let state = collectState(); // состояние полей из таблицы
     let result = [...data]; // копируем для последующего изменения
     // @todo: использование
+    console.log('Данных до поиска:', result.length);
     result = applySearch(result, state, action);
+    console.log('Данных после поиска:', result.length);
+    console.log('Текст поиска из стейта:', state.search);
+    result = applyFiltering(result, state, action || {});
     result = applySorting(result, state, action);
-    result = applyFiltering(result, state, action);
     result = applyPagination(result, state, action);
 
-
+    console.log('Элемент поиска:', document.querySelector('[name="search"]'));
     sampleTable.render(result)
 }
 

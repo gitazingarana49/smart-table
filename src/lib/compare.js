@@ -303,6 +303,8 @@ function createComparison(ruleNames, customRules = []) {
             ...customRules
         ];
 
+        console.log('Сравниваем:', source, 'с запросом:', target);
+
         return compare(source, target, rulesList);
     };
 }

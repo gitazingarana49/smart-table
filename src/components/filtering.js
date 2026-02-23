@@ -21,8 +21,9 @@ export function initFiltering(elements, indexes) {
 
     return (data, state, action) => {
         // @todo: #4.2 — обработать очистку поля
-        if (action && action.name === 'clear') {
-            const fieldName = action.element.dataset.field;
+
+        if (action?.name === 'clear') {
+            const fieldName = action.element?.dataset?.field;
             if (elements[fieldName]) {
                 elements[fieldName].value = '';
                 state[fieldName] = '';

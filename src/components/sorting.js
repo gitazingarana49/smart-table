@@ -1,6 +1,46 @@
 import {sortCollection, sortMap} from "../lib/sort.js";
-
 export function initSorting(columns) {
+    return (data, state, action) => {
+        let field = null;
+        let order = 'none';
+
+        // 1. Определяем текущее поле и направление сортировки
+        if (action?.name === 'sort' && action.element) {
+            const element = action.element;
+
+            const currentOrder = element.dataset.value || 'none';
+            const nextOrder = sortMap[currentOrder];
+
+            element.dataset.value = nextOrder;
+            field = element.dataset.field;
+            order = nextOrder;
+
+            // Сбрасываем остальные колонки
+            columns.forEach(column => {
+                if (column !== element) {
+                    column.dataset.value = 'none';
+                }
+            });
+        } else {
+            // Если это обычный рендер, ищем активную колонку
+            columns.forEach(column => {
+                if (column.dataset.value && column.dataset.value !== 'none') {
+                    field = column.dataset.field;
+                    order = column.dataset.value;
+                }
+            });
+        }
+
+        // 2. ВАЖНО: Если сортировка не активна, ВСЕГДА возвращаем исходные данные
+        if (!field || order === 'none') {
+            return data;
+        }
+        // 3. Вызываем функцию сортировки (убедитесь, что она импортирована)
+        // Если sortCollection вернет undefined, возвращаем data, чтобы не упала пагинация
+        return sortCollection(data, field, order) || data;
+    };
+}
+    /*
     return (data, state, action) => {
         let field = null;
         let order = null;
@@ -8,16 +48,16 @@ export function initSorting(columns) {
         if (action && action.name === 'sort') {
             // @todo: #3.1 — запомнить выбранный режим сортировки
             const element = action.element;
-            const currentOrder = element.dataset.sort || 'none';
+            const nextOrder = sortMap[element.dataset.value] || 'asc';
 
-            action.dataset.value = sortMap[action.dataset.value];    // Сохраним и применим как текущее следующее состояние из карты
+            element.dataset.value = nextOrder;   // Сохраним и применим как текущее следующее состояние из карты
             field = action.dataset.field;                            // Информация о сортируемом поле есть также в кнопке
-            order = action.dataset.value;                            // Направление заберём прямо из датасета для точности
+            order = nextOrder;                            // Направление заберём прямо из датасета для точности
 
 
             // @todo: #3.2 — сбросить сортировки остальных колонок
             columns.forEach(column => {                                    // Перебираем элементы (в columns у нас массив кнопок)
-                if (column.dataset.field !== action.dataset.field) {    // Если это не та кнопка, что нажал пользователь
+                if (column.dataset.field !== element.dataset.field) {    // Если это не та кнопка, что нажал пользователь
                     column.dataset.value = 'none';                        // тогда сбрасываем её в начальное состояние
                 }
             });
@@ -34,4 +74,4 @@ export function initSorting(columns) {
 
         return sortCollection(data, field, order);
     }
-}
+        */
