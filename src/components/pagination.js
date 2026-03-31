@@ -43,5 +43,5 @@ export const initPagination = ({pages, fromRow, toRow, totalRows}, createPage) =
        return {
         updatePagination,
         applyPagination
-       }
-    };
+      }
+};

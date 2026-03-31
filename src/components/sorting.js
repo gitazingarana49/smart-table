@@ -21,8 +21,7 @@ export function initSorting(columns) {
                     column.dataset.value = 'none';
                 }
             });
-        } else {
-            // Если это обычный рендер, ищем активную колонку
+        } else { // Если это обычный рендер, ищем активную колонку
             columns.forEach(column => {
                 if (column.dataset.value && column.dataset.value !== 'none') {
                     field = column.dataset.field;

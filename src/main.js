@@ -2,53 +2,55 @@ import './fonts/ys-display/fonts.css'
 import './style.css'
 
 import {data as sourceData} from "./data/dataset_1.js";
-
 import {initData} from "./data.js";
 import {processFormData} from "./lib/utils.js";
-
 import {initTable} from "./components/table.js";
-
 import { initSearching } from './components/searching.js';
-
 import { initSorting } from './components/sorting.js';
-
 import {initFiltering} from './components/filtering.js';
 import { initPagination } from './components/pagination.js';
 
-// @todo: подключение
-/**
- * Сбор и обработка полей из таблицы
- * @returns {Object}
+/**Собирает текующее состояние полей поиска, всех фильтров и пагинации из DOM-дерева.
+ * Преобразует строковые значения (FromData) в числа для корректной работы API.
+ * @returns {Object} объект состояния {rowPerPage: number, page: number...}
  */
 function collectState() {
     const state = processFormData(new FormData(sampleTable.container));
 
     const rowsPerPage = parseInt(state.rowsPerPage);    // приведём количество страниц к числу
-    const page = parseInt(state.page ?? 1);               // номер страницы по умолчанию 1 и тоже число
+    const page = parseInt(state.page ?? 1);            // номер страницы по умолчанию 1 и тоже число
 
-    return {                                            // расширьте существующий return вот так
+    return {                                          
         ...state,
         rowsPerPage,
         page
     };
 }
 
+/**
+ * Инициализация компонента таблицы
+ * Регестрирует шаблны и порядок отображения самостоятельных блоков: поиск, фильтры, пагинация
+ */
 const sampleTable = initTable({
     tableTemplate: 'table',
     rowTemplate: 'row',
     before: ['search', 'header', 'filter'],
     after: ['pagination']
-}, render);
+}, render);                                 // передаем функцию перерисовки как колбэк на любые изменения в таблице
 
 const appRoot = document.querySelector('#app');
 appRoot.appendChild(sampleTable.container);
 
-// Исходные данные используемые в render()
+
+//Инициализация слоя данных используемых в render()
 const API = initData(sourceData);
 
+/**
+ * Инициализация модулей логики
+ * Каждый модуль возвращает функцию по типу applyNameOfAction, которая модифицурует объект запроса (query) перед отправкой на сервер
+ */
 const applySearch = initSearching('search');
 
-// @todo: инициализация
 const applySorting = initSorting([        // Нам нужно передать сюда массив элементов, которые вызывают сортировку, чтобы изменять их визуальное представление
     sampleTable.header.elements.sortByDate,
     sampleTable.header.elements.sortByTotal
@@ -68,32 +70,40 @@ const { applyPagination, updatePagination } = initPagination(
     }
 );
 
-
-/**
- * Перерисовка состояния таблицы при любых изменениях
- * @param {HTMLButtonElement?} action
+/**Главная функция отрисовки
+ * Вызывается при любом действии пользователя (клик по странице, ввод в поиской строке, смена фильтра)
+ * @param {HTMLButtonElement?} action Перерисовка состояния таблицы при любых изменениях
  */
 async function render(action) {
     let state = collectState(); // состояние полей из таблицы
-    let query = {}; // копируем для последующего изменения
-    // @todo: использование
+    let query = {};            // инициализация объекта для GET-параметров запроса
+    
+    //напоняем объект данными о странице
     query = applyPagination(query, state, action);
     query = applyFiltering(query, state, action);
     query = applySearch(query, state, action);
     query = applySorting(query, state, action);
 
+    //запрос к серверу через обертку API
     const { total, items } = await API.getRecords(query);
     
+    //обнавляем визуальное состояние пагинации и отрисовываем строки таблицы
     updatePagination(total, query);
     sampleTable.render(items);
 }
 
+/**
+ * Начальная загрузка данных, необходимая для работы интерфейса
+ */
+
 async function init() {
     const indexes = await API.getIndexes();
 
+    //заполняем фильтры данными, полученными с сервера
     updateIndexes(sampleTable.filter.elements, {
         searchBySeller: indexes.sellers
     });
 }
 
+//запуск приложения: сначала загружаются индексы, потом отрисовывается таблица
 init().then(render);
