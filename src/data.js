@@ -19,10 +19,13 @@ export function initData() {
     // функция получения индексов
     const getIndexes = async () => {
         if (!sellers || !customers) { // если индексы ещё не установлены, то делаем запросы
-            [sellers, customers] = await Promise.all([ // запрашиваем и деструктурируем в уже объявленные ранее переменные
+            const [ rawSellers, rawCustomers ] = await Promise.all([ // запрашиваем и деструктурируем в уже объявленные ранее переменные
                 fetch(`${BASE_URL}/sellers`).then(res => res.json()), // запрашиваем продавцов
                 fetch(`${BASE_URL}/customers`).then(res => res.json()), // запрашиваем покупателей
             ]);
+
+            sellers = rawSellers;
+            customers = rawCustomers;
         }
 
         return { sellers, customers };
