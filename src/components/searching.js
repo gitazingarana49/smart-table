@@ -1,16 +1,11 @@
-
-export function initSearching(searchField, render) {
-    const input = document.querySelector(`[data-name="${searchField}"] input`);
-
-    if (input && render) {
-        input.addEventListener('input', () => {
-            render(input);
-        });
-    }
-
+export function initSearching(searchField) {
     return (query, state, _action) => {
-        return state[searchField] ? Object.assign({}, query, { // проверяем, что в поле поиска было что-то введено
-            search: state[searchField] // устанавливаем в query параметр
-        }) : query; // если поле с поиском пустое, просто возвращаем query без изменений
-    }
+        if (state[searchField]) {
+            return  Object.assign({}, query, { // проверяем, что в поле поиска было что-то введено
+            search: state[searchField],
+            page: 1 // устанавливаем в query параметр
+            }); // если поле с поиском пустое, просто возвращаем query без изменений
+        } 
+    return query; 
+    };
 }

@@ -56,7 +56,7 @@ const applySorting = initSorting([        // Нам нужно передать 
     sampleTable.header.elements.sortByTotal
 ], render);
 
-const { applyFiltering, updateIndexes } = initFiltering(sampleTable.filter.elements, {}, render);
+const { applyFiltering, updateIndexes } = initFiltering(sampleTable.filter.elements);
 
 const { applyPagination, updatePagination } = initPagination(
     sampleTable.pagination.elements,             // передаём сюда элементы пагинации, найденные в шаблоне
@@ -76,7 +76,10 @@ const { applyPagination, updatePagination } = initPagination(
  */
 async function render(action) {
     let state = collectState(); // состояние полей из таблицы
-    let query = {};            // инициализация объекта для GET-параметров запроса
+    let query = {
+        limit: 10,
+        page: 1
+    };            // инициализация объекта для GET-параметров запроса
     
     //напоняем объект данными о странице
     query = applyPagination(query, state, action);

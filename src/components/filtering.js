@@ -1,11 +1,4 @@
-export function initFiltering(elements, option, render) {
-    //Повесить событие на каждое поле фильтра
-        Object.values(elements).forEach(el => {
-            el.addEventListener('change', () => {
-                if (typeof render === 'function') render(el);
-            });
-        });
-
+export function initFiltering(elements) {
     const updateIndexes = (elements, indexes) => {
     // @todo: #4.1 — заполнить выпадающие списки опциями
         Object.keys(indexes)                                    // Получаем ключи из объекта
