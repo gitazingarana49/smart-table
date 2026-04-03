@@ -1,79 +1,34 @@
 import { sortMap } from "../lib/sort.js";
-export function initSorting(columns, render) {
-    Object.values(columns).forEach(column => {
-        column.addEventListener('click', () => {
-            if (typeof render === 'function') {
-                render(column);
-            }
-        });
-    });
-        return (query, state, action) => {
+
+export function initSorting(columns) {
+    return (query, state, action) => {
         let field = null;
         let order = 'none';
 
-        // 1. Определяем текущее поле и направление сортировки
-        if (action?.name === 'sort' && action.element) {
-            const element = action.element;
+        const clickedColumn = columns.find(col => col === action);
 
-            const currentOrder = element.dataset.value || 'none';
-            const nextOrder = sortMap[currentOrder];
+        if (clickedColumn) {
+            field = clickedColumn.dataset.name.replace('sortBy', '').toLowerCase();
 
-            element.dataset.value = nextOrder;
-            field = element.dataset.field;
-            order = nextOrder;
+            const currentOrder = clickedColumn.dataset.order || 'none';
+            order = sortMap[currentOrder];
 
-            // Сбрасываем остальные колонки
-            columns.forEach(column => {
-                if (column !== element) {
-                    column.dataset.value = 'none';
-                }
+            clickedColumn.dataset.order = order;
+
+            columns.forEach(col => {
+                if (col !== clickedColumn) col.dataset.order = 'none';
             });
-        } else { // Если это обычный рендер, ищем активную колонку
-            columns.forEach(column => {
-                if (column.dataset.value && column.dataset.value !== 'none') {
-                    field = column.dataset.field;
-                    order = column.dataset.value;
+            } else {
+                const activeCol = columns.find(c => c.dataset.order && c.dataset.order !== 'none');
+
+                if (activeCol) {
+                    field = activeCol.dataset.name.replace('sortBy', '').toLowerCase();
+                    order = activeCol.dataset.order;
                 }
-            });
-        }
+            }
 
         const sort = (field && order !== 'none') ? `${field}:${order}` : null; // сохраним в переменную параметр сортировки в виде field:direction
 
         return sort ? Object.assign({}, query, { sort }) : query; // по общему принципу, если есть сортировка, добавляем, если нет, то не трогаем query 
     };
 }
-
-
-
-
-
-
-
-/*
-    return (query, state, action) => {
-        let field = null;
-        let order = 'none';
-
-        if (action && action.tagName === 'TH') {
-            field = action.dataset.name;
-
-            const currentOrder = action.dataset.order || 'none';
-            order = sortMap[currentOrder];
-
-            action.dataset.order = order;
-
-            Object.values(columns).forEach(col => {
-                if (col !== action) col.dataset.order = 'none';
-            });
-        }
-        else {
-            const activeCol = Object.values(columns).find(c => c.dataset.order && c.dataset.order !== 'none');
-                if(activeCol) {
-                    field = activeCol.dataset.name;
-                    order =activeCol.dataset.order;
-                }
-            }
-
-            const apiOrder = order === 'up' ? 'asc' : (order === 'down' ? 'desc' : null);
-
-    */

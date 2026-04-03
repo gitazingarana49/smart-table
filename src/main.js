@@ -54,7 +54,7 @@ const applySearch = initSearching('search', render);
 const applySorting = initSorting([        // Нам нужно передать сюда массив элементов, которые вызывают сортировку, чтобы изменять их визуальное представление
     sampleTable.header.elements.sortByDate,
     sampleTable.header.elements.sortByTotal
-]);
+], render);
 
 const { applyFiltering, updateIndexes } = initFiltering(sampleTable.filter.elements, {}, render);
 
