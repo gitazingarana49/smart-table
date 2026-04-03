@@ -1,6 +1,13 @@
 import { sortMap } from "../lib/sort.js";
-export function initSorting(columns) {
-    return (query, state, action) => {
+export function initSorting(columns, render) {
+    Object.values(columns).forEach(column => {
+        column.addEventListener('click', () => {
+            if (typeof render === 'function') {
+                render(column);
+            }
+        });
+    });
+        return (query, state, action) => {
         let field = null;
         let order = 'none';
 
@@ -35,3 +42,38 @@ export function initSorting(columns) {
         return sort ? Object.assign({}, query, { sort }) : query; // по общему принципу, если есть сортировка, добавляем, если нет, то не трогаем query 
     };
 }
+
+
+
+
+
+
+
+/*
+    return (query, state, action) => {
+        let field = null;
+        let order = 'none';
+
+        if (action && action.tagName === 'TH') {
+            field = action.dataset.name;
+
+            const currentOrder = action.dataset.order || 'none';
+            order = sortMap[currentOrder];
+
+            action.dataset.order = order;
+
+            Object.values(columns).forEach(col => {
+                if (col !== action) col.dataset.order = 'none';
+            });
+        }
+        else {
+            const activeCol = Object.values(columns).find(c => c.dataset.order && c.dataset.order !== 'none');
+                if(activeCol) {
+                    field = activeCol.dataset.name;
+                    order =activeCol.dataset.order;
+                }
+            }
+
+            const apiOrder = order === 'up' ? 'asc' : (order === 'down' ? 'desc' : null);
+
+    */

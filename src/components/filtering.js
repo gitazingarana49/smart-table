@@ -1,21 +1,33 @@
-
-export function initFiltering(elements) {
+export function initFiltering(elements, option, render) {
+    //Повесить событие на каждое поле фильтра
+        Object.values(elements).forEach(el => {
+            el.addEventListener('change', () => {
+                if (typeof render === 'function') render(el);
+            });
+        });
 
     const updateIndexes = (elements, indexes) => {
     // @todo: #4.1 — заполнить выпадающие списки опциями
         Object.keys(indexes)                                    // Получаем ключи из объекта
         .forEach((elementName) => {                            // Перебираем по именам
-            elements[elementName].append(                     // в каждый элемент добавляем опции
-                ...Object.values(indexes[elementName])        // формируем массив имён, значений опций
-                    .map(name => {                           // используйте name как значение и текстовое содержимое
-                        const option = document.createElement('option');// @todo: создать и вернуть тег опции
-                        option.value = name;
-                        option.textContent = name;
+           if (elements[elementName]) {
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
 
-                        return option;
-                        })
-                )
-            })
+            elements[elementName].replaceChildren(defaultOption);
+
+            const options = Object.values(indexes[elementName])        // формируем массив имён, значений опций
+                .map(name => {                           // используйте name как значение и текстовое содержимое
+                    const option = document.createElement('option');// @todo: создать и вернуть тег опции
+                    option.value = name;
+                    option.textContent = name;
+
+                    return option;
+                });
+                
+                elements[elementName].append(...options);
+            }
+        })
     }
 
     const applyFiltering = (query, state, action) => {
@@ -38,7 +50,7 @@ export function initFiltering(elements) {
             }
         })
 
-        return Object.keys(filter).lenght ? Object.assign({}, query, filter) : query; // если в фильтре что-то добавилось, применим к запросу
+        return Object.keys(filter).length ? Object.assign({}, query, filter) : query; // если в фильтре что-то добавилось, применим к запросу
     }
 
     return {

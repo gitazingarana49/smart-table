@@ -1,7 +1,6 @@
 import './fonts/ys-display/fonts.css'
 import './style.css'
 
-import {data as sourceData} from "./data/dataset_1.js";
 import {initData} from "./data.js";
 import {processFormData} from "./lib/utils.js";
 import {initTable} from "./components/table.js";
@@ -15,6 +14,7 @@ import { initPagination } from './components/pagination.js';
  * @returns {Object} объект состояния {rowPerPage: number, page: number...}
  */
 function collectState() {
+   // const formElement = document.querySelector('form.table') || sampleTable.querySelector.container()
     const state = processFormData(new FormData(sampleTable.container));
 
     const rowsPerPage = parseInt(state.rowsPerPage);    // приведём количество страниц к числу
@@ -43,20 +43,20 @@ appRoot.appendChild(sampleTable.container);
 
 
 //Инициализация слоя данных используемых в render()
-const API = initData(sourceData);
+const API = initData();
 
 /**
  * Инициализация модулей логики
  * Каждый модуль возвращает функцию по типу applyNameOfAction, которая модифицурует объект запроса (query) перед отправкой на сервер
  */
-const applySearch = initSearching('search');
+const applySearch = initSearching('search', render);
 
 const applySorting = initSorting([        // Нам нужно передать сюда массив элементов, которые вызывают сортировку, чтобы изменять их визуальное представление
     sampleTable.header.elements.sortByDate,
     sampleTable.header.elements.sortByTotal
 ]);
 
-const { applyFiltering, updateIndexes } = initFiltering(sampleTable.filter.elements, {});
+const { applyFiltering, updateIndexes } = initFiltering(sampleTable.filter.elements, {}, render);
 
 const { applyPagination, updatePagination } = initPagination(
     sampleTable.pagination.elements,             // передаём сюда элементы пагинации, найденные в шаблоне
@@ -84,9 +84,9 @@ async function render(action) {
     query = applySearch(query, state, action);
     query = applySorting(query, state, action);
 
+    // ЛОГ 1: Смотрим, какой запрос улетает на сервер
     //запрос к серверу через обертку API
     const { total, items } = await API.getRecords(query);
-    
     //обнавляем визуальное состояние пагинации и отрисовываем строки таблицы
     updatePagination(total, query);
     sampleTable.render(items);
