@@ -32,7 +32,7 @@ export function initFiltering(elements, option, render) {
 
     const applyFiltering = (query, state, action) => {
     // @todo: #4.2 — обработать очистку поля
-        if (action?.name === 'clear') {
+        if (action && action.type === 'clear') {
             const fieldName = action.element?.dataset?.field;
             if (elements[fieldName]) {
                 elements[fieldName].value = '';
