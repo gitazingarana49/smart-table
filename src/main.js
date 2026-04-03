@@ -77,8 +77,8 @@ const { applyPagination, updatePagination } = initPagination(
 async function render(action) {
     let state = collectState(); // состояние полей из таблицы
     let query = {
-        limit: 10,
-        page: 1
+        limit: state.rowsPerPage || 10,
+        page: state.page || 1
     };            // инициализация объекта для GET-параметров запроса
     
     //напоняем объект данными о странице
@@ -109,4 +109,7 @@ async function init() {
 }
 
 //запуск приложения: сначала загружаются индексы, потом отрисовывается таблица
-init().then(render);
+document.addEventListener('DOMContentLoaded', () => {
+    init().then(render);
+});
+
