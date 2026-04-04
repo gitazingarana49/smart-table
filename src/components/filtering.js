@@ -24,12 +24,16 @@ export function initFiltering(elements) {
     }
 
     const applyFiltering = (query, state, action) => {
+        const target = action?.target || action;
     // @todo: #4.2 — обработать очистку поля
-        if (action && action.type === 'clear') {
-            const fieldName = action.element?.dataset?.field;
-            if (elements[fieldName]) {
+        if (target && (target.name === 'clear' || target.dataset?.name === 'clear')) {
+            const fieldName = action.dataset?.field;
+
+            if (fieldName && elements[fieldName]) {
                 elements[fieldName].value = '';
                 state[fieldName] = '';
+
+                delete query[`filter[${fieldName}]`];
             }
         }
 
@@ -39,12 +43,36 @@ export function initFiltering(elements) {
             if (elements[key]) {
                 if (['INPUT', 'SELECT'].includes(elements[key].tagName) && elements[key].value) { // ищем поля ввода в фильтре с непустыми данными
                     filter[`filter[${elements[key].name}]`] = elements[key].value; // чтобы сформировать в query вложенный объект фильтра
+                } else {
+                    delete query[`filter[${elements[key].name}]`];
                 }
             }
         })
 
         return Object.keys(filter).length ? Object.assign({}, query, filter) : query; // если в фильтре что-то добавилось, применим к запросу
     }
+
+    document.addEventListener('click', (e) => {
+    // Ищем кнопку очистки, даже если кликнули по иконке внутри неё
+    const clearBtn = e.target.closest('button[name="clear"]');
+    if (clearBtn) {
+        e.preventDefault();
+        
+        // Находим поле, которое нужно очистить
+        const fieldName = clearBtn.dataset.field;
+        const input = document.querySelector(`[name="${fieldName}"]`);
+        
+        if (input) {
+            input.value = ''; // Очищаем поле
+            // Имитируем отправку формы, чтобы сработал onAction в table.js
+            clearBtn.closest('form').dispatchEvent(new SubmitEvent('submit', {
+                submitter: clearBtn,
+                bubbles: true,
+                cancelable: true
+            }));
+        }
+    }
+});
 
     return {
         updateIndexes,

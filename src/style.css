@@ -1,3 +1,4 @@
+
 :root {
     /* Colors */
     --color-primary: #3F5AA4;
@@ -213,6 +214,7 @@ button.icon:hover,
     gap: var(--size-gap);
     border-bottom: 1px solid var(--color-border);
     background-color: var(--color-white);
+    order: -3;
 }
 
 .search-wrapper {
@@ -250,6 +252,7 @@ button.icon:hover,
     display: flex;
     flex-direction: column;
     width: 100%;
+    order: 2;
 }
 
 .table-row {
@@ -268,6 +271,7 @@ button.icon:hover,
     font-size: var(--font-size);
     line-height: var(--line-height);
     font-weight: 500;
+    order: -2;
 }
 
 .header-row .table-column {
@@ -295,6 +299,7 @@ button.icon:hover,
 /* Filter row */
 .filter-row {
     background-color: var(--color-background);
+    order: -1;
 }
 
 .filter-row .table-column {
@@ -385,6 +390,7 @@ button.icon:hover,
     align-items: center;
     padding: 24px 24px 24px 113px;
     background-color: var(--color-white);
+    order: 55;
 }
 
 .pagination-controls {
@@ -484,3 +490,4 @@ button.icon:hover,
         flex-direction: column;
     }
 }
+

@@ -109,7 +109,5 @@ async function init() {
 }
 
 //запуск приложения: сначала загружаются индексы, потом отрисовывается таблица
-document.addEventListener('DOMContentLoaded', () => {
     init().then(render);
-});
 
